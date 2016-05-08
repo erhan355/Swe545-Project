@@ -31,10 +31,10 @@ class Game:
     def print_board(self,board = None):
         "Display board on screen"
         if board is None:
-            print self.form % tuple(self.board[6:9] + self.board[3:6] + self.board[0:3])
+            return  self.form % tuple(self.board[6:9] + self.board[3:6] + self.board[0:3])
         else:
             # when the game starts, display numbers on all the grids
-            print self.form % tuple(board[6:9] + board[3:6] + board[0:3])
+            return  self.form % tuple(board[6:9] + board[3:6] + board[0:3])
 
     def get_marker(self):
         marker = raw_input("Would you like your marker to be X or Y?: ").upper()
@@ -47,7 +47,7 @@ class Game:
 
 
     def help(self):
-        print '''
+        return '''
 \n\t The game board has 9 sqaures(3X3).
 \n\t Two players take turns in marking the spots/grids on the board.
 \n\t The first player to have 3 pieces in a horizontal, vertical or diagonal row wins the game.
@@ -142,7 +142,7 @@ class Game:
        "welcomes user, prints help message and hands over to the main game loop"
        # welcome user
        print '''\n\t-----------------------------------
-                \n\t   TIC-TAC-TOE by Mawuli Adzaku
+                \n\t   TIC-TAC-TOE Game
                 \n\t------------------------------------
              '''
        self.print_board(range(1,10))
