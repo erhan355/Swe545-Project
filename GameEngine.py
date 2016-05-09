@@ -8,7 +8,6 @@ class Game:
     "Tic-Tac-Toe class. This class holds the user interaction, and game logic"
     def __init__(self):
         self.board = [' '] * 9
-        self.player_name = ''
         self.player_marker = ''
         self.bot_name = 'TBot'
         self.bot_marker = ''
@@ -19,7 +18,7 @@ class Game:
         self.corners = [0,2,6,8]
         self.sides = [1,3,5,7]
         self.middle = 4
-
+        self.GameFinished=False
         self.form = '''
            \t| %s | %s | %s |
            \t-------------
@@ -36,31 +35,19 @@ class Game:
             # when the game starts, display numbers on all the grids
             return  self.form % tuple(board[6:9] + board[3:6] + board[0:3])
 
-    def get_marker(self):
-        marker = raw_input("Would you like your marker to be X or Y?: ").upper()
-        while marker not in ["X","Y"]:
-            marker = raw_input("Would you like your marker to be X  or Y? :").upper()
-        if marker == "X":
-            return ('X', 'Y')
-        else:
-            return ('Y','X')
-
-
     def help(self):
         return '''
 \n\t The game board has 9 sqaures(3X3).
 \n\t Two players take turns in marking the spots/grids on the board.
 \n\t The first player to have 3 pieces in a horizontal, vertical or diagonal row wins the game.
 \n\t To place your mark in the desired square, simply type the number corresponding with the square on the grid
-
 \n\t Press Ctrl + C to quit
 '''
 
     def quit_game(self):
         "exits game"
         self.print_board
-        print "\n\t Thanks for playing :-) \n\t Come play again soon!\n"
-        sys.exit()
+        return "\n\t Thanks for playing :-) \n\t Come play again soon!\n"
 
     def is_winner(self, board, marker):
         "check if this marker will win the game"
@@ -79,11 +66,6 @@ class Game:
         return False
 
     def get_bot_move(self):
-        '''
-        find the best space on the board for the bot. Objective
-        is to find a winning move, a blocking move or an equalizer move.
-        Bot must always win
-        '''
         # check if bot can win in the next move
         for i in range(0,len(self.board)):
             board_copy = copy.deepcopy(self.board)
@@ -140,98 +122,51 @@ class Game:
 
     def start_game(self):
        "welcomes user, prints help message and hands over to the main game loop"
-       # welcome user
-       print '''\n\t-----------------------------------
+       welcomeScreen = '''\n\t-----------------------------------
                 \n\t   TIC-TAC-TOE Game
                 \n\t------------------------------------
              '''
-       self.print_board(range(1,10))
-       self.help()
-       self.player_name = self.get_player_name()
-
-       # get user's preferred marker
-       self.player_marker, self.bot_marker = self.get_marker()
-       print "Your marker is " + self.player_marker
-
-       # randomly decide who can play first
+       welcomeScreen+=self.print_board(range(1,10))
+       welcomeScreen+=self.help()
+       self.player_marker, self.bot_marker = "X","Y"
        if random.randint(0,1) == 0:
-           print "I will go first"
-          # self.make_move(self.board,random.choice(self.corners), self.bot_marker)
-           #self.print_board()
-           self.enter_game_loop('b')
+           self.get_bot_move()
+           welcomeScreen+=self.help()
+           welcomeScreen+=self.print_board(range(1,10))
+           welcomeScreen+= "I moved first now its your turn \n \t"
+
        else:
-           print "You will go first"
-           # now, enter the main game loop
-           self.enter_game_loop('h')
+           welcomeScreen+=self.help()
+           welcomeScreen+=self.print_board(range(1,10))
+           welcomeScreen+= "You will go first \n \t"
 
-
-    def get_player_move(self):
-        move = int(input("Pick a spot to move: (1-9) "))
-        while move not in [1,2,3,4,5,6,7,8,9] or not self.is_space_free(self.board,move-1) :
-            move = int(input("Invalid move. Please try again: (1-9) "))
-        return move - 1
-
-    def get_player_name(self):
-        return raw_input("Hi, i am %s" % self.bot_name + ". What is your name? ")
-
-
-    def enter_game_loop(self,turn):
-       "starts the main game loop"
-       is_running = True
-       player = turn #h for human, b for bot
-       while is_running:
-           if player == 'h':
-               user_input = self.get_player_move()
-               self.make_move(self.board,user_input, self.player_marker)
-               if(self.is_winner(self.board, self.player_marker)):
-                   self.print_board()
-                   print "\n\tCONGRATULATIONS %s, YOU HAVE WON THE GAME!!! \\tn" % self.player_name
-                   #self.incr_score(self.player_name)
-                   is_running = False
-                   #break
-               else:
-                   if self.is_board_full():
-                       self.print_board()
-                       print "\n\t-- Match Draw --\t\n"
-                       is_running = False
-                       #break
+    def check_valid_move(self,move):
+        if(move not in [1,2,3,4,5,6,7,8,9] or not self.is_space_free(self.board,move-1)):
+            return True
+        else:
+            return  False
+    def make_moves(self,move):
+        message=""
+        move = int(move)
+        #Player Movement
+        self.make_move(self.board,(move - 1), self.player_marker)
+        if(self.is_winner(self.board, self.player_marker)):
+                   self.GameFinished=True
+                   message=self.print_board()
+                   message+= "\n\tCONGRATULATIONS %s, YOU HAVE WON THE GAME!!! \\tn"
+        elif(self.is_board_full()):
+                   self.GameFinished=True
+                   message=self.print_board()
+                   message=+ "\n\t-- Match Draw --\t\n"
+        #Bot Movement
+        else:
+                   bot_move =  self.get_bot_move()
+                   self.make_move(self.board, bot_move, self.bot_marker)
+                   if (self.is_winner(self.board, self.bot_marker)):
+                    self.GameFinished=True
+                    message=self.print_board()
+                    message=+ "\n\t%s HAS WON!!!!\t\n" % self.bot_name
                    else:
-                       self.print_board()
-                       player = 'b'
-           # bot's turn to play
-           else:
-              bot_move =  self.get_bot_move()
-              self.make_move(self.board, bot_move, self.bot_marker)
-              if (self.is_winner(self.board, self.bot_marker)):
-                  self.print_board()
-                  print "\n\t%s HAS WON!!!!\t\n" % self.bot_name
-                  #self.incr_score(self.bot_name)
-                  is_running = False
-                  break
-              else:
-                  if self.is_board_full():
-                      self.print_board()
-                      print "\n\t -- Match Draw -- \n\t"
-                      is_running = False
-                      #break
-                  else:
-                      self.print_board()
-                      player = 'h'
+                    message=self.print_board()
 
-       # when you break out of the loop, end the game
-       self.end_game()
-
-    def end_game(self):
-       play_again = raw_input("Would you like to play again? (y/n): ").lower()
-       if play_again == 'y':
-           self.__init__() # necessary for re-initialization of the board etc
-           self.start_game()
-       else:
-           print "\n\t-- GAME OVER!!!--\n\t"
-           self.quit_game()
-
-
-
-if __name__ == "__main__":
-     TicTacToe = Game()
-     TicTacToe.start_game()
+        return {'message':message, 'resultBoolean':self.GameFinished}
