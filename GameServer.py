@@ -1,33 +1,29 @@
-import SocketServer
-import socket
-from SimpleXMLRPCServer import SimpleXMLRPCServer,SimpleXMLRPCRequestHandler
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+import xmlrpclib
 from GameEngine import  Game
-# Threaded mix-in
-class MultiThreadedXMLRPCServer(SocketServer.ThreadingMixIn, SimpleXMLRPCServer): pass
+class Poco:
+ def __init__(self):
+    self.TicTacToe = Game()
+ def startGame(self):
+    return self.TicTacToe.start_game()
+ def makeMove(self,move):
+    if(not self.TicTacToe.check_valid_move(move) == True):
+     raise xmlrpclib.Fault(11, "some message")
+     return self.TicTacToe.make_moves(move)
+ def endGame(self):
+     value=None
+# Restrict to a particular path.
+class RequestHandler(SimpleXMLRPCRequestHandler):
+    rpc_paths = ('/RPC2',)
 
-# Example class to be published
-
-def startNewGame():
-        TicTacToe = Game()
-        get_remote_machine_info()
-        TicTacToe.start_game()
-        return "Ok"
-
-
-def get_remote_machine_info():
-    remote_host = 'www.python.org'
-    try:
-        print "IP address: %s" %socket.gethostbyname(remote_host)
-    except socket.error, err_msg:
-        print "%s: %s" %(remote_host, err_msg)
-
-
-
-# Instantiate and bind to localhost:8079
-server = MultiThreadedXMLRPCServer(('', 8000), SimpleXMLRPCRequestHandler)
-
+# Create server
+server = SimpleXMLRPCServer(("localhost", 8000),
+                            requestHandler=RequestHandler,allow_none=True)
 server.register_introspection_functions()
 
-server.register_function(startNewGame)
-# run!
+server.register_instance(Poco())
 server.serve_forever()
+
+class MyException(Exception):
+    pass
