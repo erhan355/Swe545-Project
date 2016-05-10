@@ -10,9 +10,10 @@ while not gameFinished:
  try:
    move=int(input("Please make your move"))
    result=server.makeMove(move)
+
    if(result["resultBoolean"]):
-     print result["resultText"]
      gameFinished=True
+   print result["message"]
  except xmlrpclib.Fault as err:
     if(err.faultCode==11):
        print ("Invalid move. Please try again: (1-9)")

@@ -9,8 +9,12 @@ class Poco:
     return self.TicTacToe.start_game()
  def makeMove(self,move):
     if(not self.TicTacToe.check_valid_move(move) == True):
-     raise xmlrpclib.Fault(11, "some message")
-     return self.TicTacToe.make_moves(move)
+     raise xmlrpclib.Fault(11, "Invalid Move")
+    else:
+     result=self.TicTacToe.make_moves(move)
+     resultBoolean=result["resultBoolean"]
+     message=result["message"]
+    return {'message':message, 'resultBoolean':resultBoolean}
  def endGame(self):
      value=None
 # Restrict to a particular path.

@@ -9,7 +9,6 @@ class Game:
     def __init__(self):
         self.board = [' '] * 9
         self.player_marker = ''
-        self.bot_name = 'TBot'
         self.bot_marker = ''
         self.winning_combos = (
         [6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8],
@@ -141,7 +140,7 @@ class Game:
            welcomeScreen+= "You will go first \n \t"
        return  welcomeScreen
     def check_valid_move(self,move):
-        if(move not in [1,2,3,4,5,6,7,8,9] or not self.is_space_free(self.board,move-1)):
+        if(move  in [1,2,3,4,5,6,7,8,9] and  self.is_space_free(self.board,move-1)):
             return True
         else:
             return  False
@@ -152,21 +151,25 @@ class Game:
         self.make_move(self.board,(move - 1), self.player_marker)
         if(self.is_winner(self.board, self.player_marker)):
                    self.GameFinished=True
-                   message=self.print_board()
-                   message+= "\n\tCONGRATULATIONS %s, YOU HAVE WON THE GAME!!! \\tn"
+                   message+=self.print_board()
+                   message= (message+ "\n\tCONGRATULATIONS , YOU HAVE WON THE GAME!!! \\tn")
         elif(self.is_board_full()):
                    self.GameFinished=True
-                   message=self.print_board()
-                   message=+ "\n\t-- Match Draw --\t\n"
+                   message+=self.print_board()
+                   message= (message+ "\n\t-- Match Draw --\t\n")
         #Bot Movement
         else:
                    bot_move =  self.get_bot_move()
                    self.make_move(self.board, bot_move, self.bot_marker)
                    if (self.is_winner(self.board, self.bot_marker)):
                     self.GameFinished=True
-                    message=self.print_board()
-                    message=+ "\n\t%s HAS WON!!!!\t\n" % self.bot_name
+                    message+=self.print_board()
+                    message= (message+ "\n\t TBot HAS WON!!!!\t\n")
+                   elif(self.is_board_full()):
+                    self.GameFinished=True
+                    message+=self.print_board()
+                    message= (message+ "\n\t-- Match Draw --\t\n")
                    else:
-                    message=self.print_board()
+                    message+=self.print_board()
 
         return {'message':message, 'resultBoolean':self.GameFinished}
