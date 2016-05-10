@@ -126,20 +126,20 @@ class Game:
                 \n\t   TIC-TAC-TOE Game
                 \n\t------------------------------------
              '''
-       welcomeScreen+=self.print_board(range(1,10))
-       welcomeScreen+=self.help()
        self.player_marker, self.bot_marker = "X","Y"
        if random.randint(0,1) == 0:
-           self.get_bot_move()
+           bot_move =self.get_bot_move()
+           self.make_move(self.board, bot_move, self.bot_marker)
+
            welcomeScreen+=self.help()
-           welcomeScreen+=self.print_board(range(1,10))
+           welcomeScreen+=self.print_board()
            welcomeScreen+= "I moved first now its your turn \n \t"
 
        else:
            welcomeScreen+=self.help()
            welcomeScreen+=self.print_board(range(1,10))
            welcomeScreen+= "You will go first \n \t"
-
+       return  welcomeScreen
     def check_valid_move(self,move):
         if(move not in [1,2,3,4,5,6,7,8,9] or not self.is_space_free(self.board,move-1)):
             return True
