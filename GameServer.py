@@ -71,12 +71,17 @@ class ThreadManager():
         self.threadsDictionary.pop(uniqueId,None)
         self.dictionaryLock.release()
     def make_move(self,move,uniqueId):
-        print(threading.activeCount())
-        thread = self.threadsDictionary[uniqueId]
-        result=thread.makeMove(move)
-        resultBoolean=result["resultBoolean"]
-        message=result["message"]
-        return {'message':message, 'resultBoolean':resultBoolean}
+        if(self.threadsDictionary.has_key(uniqueId)):
+         print(threading.activeCount())
+         thread = self.threadsDictionary[uniqueId]
+         result=thread.makeMove(move)
+         resultBoolean=result["resultBoolean"]
+         message=result["message"]
+         return {'message':message, 'resultBoolean':resultBoolean}
+        else:
+         resultBoolean=False
+         message="You must first authenticate to play"
+         return {'message':message, 'resultBoolean':resultBoolean}
 
 # Restrict to a particular path.
 class RequestHandler(SimpleXMLRPCRequestHandler):
