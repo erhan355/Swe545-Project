@@ -59,7 +59,9 @@ class ThreadManager():
          resultBoolean=True
          return {'message':message, 'resultBoolean':resultBoolean}
         else:
-    #Todo
+          resultBoolean=False
+          message="You must first authenticate to play"
+          return {'message':message, 'resultBoolean':resultBoolean}
     def end_game(self,uniqueId):
         thread = self.threadsDictionary[uniqueId]
         #Object is nullified
