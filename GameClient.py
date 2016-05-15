@@ -1,15 +1,35 @@
 import xmlrpclib
 class GameClient:
+     def __init__(self):
+        self.uniqueId = None
+        self.server=  xmlrpclib.ServerProxy('http://localhost:8000')
      def startGame(self):
-         server.startNewGame();
-server = xmlrpclib.ServerProxy('http://localhost:8000')
-print server.startGame()
+         self.server = xmlrpclib.ServerProxy('http://localhost:8000')
+         self.uniqueId=self.server.authenticate()
+         result= self.server.start_new_game(self.uniqueId)
+         resultBoolean=result["resultBoolean"]
+         message=result["message"]
+         return {'message':message, 'resultBoolean':resultBoolean}
+
+     def makeMove(self,move):
+         result=self.server.make_move(move,self.uniqueId)
+         resultBoolean=result["resultBoolean"]
+         message=result["message"]
+         return {'message':message, 'resultBoolean':resultBoolean}
+     def endGame(self):
+         self.server.end_game(self.uniqueId)
+gameClient=GameClient()
+result= gameClient.startGame()
+isGameCanBePlayed=result["resultBoolean"]
+if(not isGameCanBePlayed):
+    print(result["message"])
+print(result["message"])
 gameFinished=False
 while not gameFinished:
 
  try:
    move=int(input("Please make your move"))
-   result=server.makeMove(move)
+   result=gameClient.makeMove(move)
 
    if(result["resultBoolean"]):
      gameFinished=True
@@ -22,4 +42,4 @@ while not gameFinished:
        print "Fault code: %d" % err.faultCode
        print "Fault string: %s" % err.faultString
        gameFinished=True
-    server.endGame()
+    gameClient.endGame()
