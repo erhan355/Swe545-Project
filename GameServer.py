@@ -33,6 +33,10 @@ class ThreadManager():
         self.dictionaryLock = threading.Lock()
 
     def authenticate(self):
+
+        if(not self.threadsDictionary.__len__()<=50):
+         raise xmlrpclib.Fault(12, "Game Limit Has Been Reached , Please try again later...")
+
         self.uniqueId =  random.getrandbits(16)
         #If this key presents in the dictionary try again
         while(self.threadsDictionary.has_key(self.uniqueId)):
