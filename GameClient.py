@@ -1,4 +1,6 @@
 import xmlrpclib
+import httplib
+import socket
 class GameClient:
      def __init__(self):
         self.uniqueId = None
@@ -28,35 +30,34 @@ while(True):
   break
  if(choiceVar!="1"):
   continue
- # gameClient=GameClient()
- # result= gameClient.startGame()
- # isGameCanBePlayed=result["resultBoolean"]
- # if(not isGameCanBePlayed):
- #    print(result["message"])
- # else:
  try:
   gameClient=GameClient()
   result= gameClient.startGame()
   print(result["message"])
   gameFinished=False
   while not gameFinished:
-
+   try:
      move=int(raw_input("Please make your move"))
      result=gameClient.makeMove(move)
 
      if(result["resultBoolean"]):
       gameFinished=True
      print result["message"]
- except xmlrpclib.Fault as err:
+   except xmlrpclib.Fault as err:
      if(err.faultCode==11):
         print ("Invalid move. Please try again: (1-9)")
-     elif(err.faultCode==12):
-        print ("Game Limit Has Been Reached , Please try again later...")
      else:
         print "A fault occurred"
         print "Fault code: %d" % err.faultCode
         print "Fault string: %s" % err.faultString
         gameFinished=True
         gameClient.endGame()
- except ValueError:
+   except ValueError:
         print "Please provide numerical value"
+ except httplib.HTTPException:
+        print "An Http Error Occured"
+ except socket.error:
+        print "A Socket Error Occured"
+ except xmlrpclib.Fault as err:
+  if(err.faultCode==12):
+        print ("Game Limit Has Been Reached , Please try again later...")
